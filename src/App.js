@@ -1,5 +1,6 @@
 import { Component } from "react";
-import shortid from "shortid";
+import { v4 as uuidv4 } from "uuid";
+import Container from "./components/Container";
 import ContactForm from "./components/ContactForm";
 import Filter from "./components/Filter";
 import ContactList from "./components/ContactList";
@@ -7,78 +8,79 @@ import ContactList from "./components/ContactList";
 class App extends Component {
   state = {
     contacts: [
-      { id: shortid.generate(), name: "Rosie Simpson", number: "459-12-56" },
-      { id: shortid.generate(), name: "Hermione Kline", number: "443-89-12" },
-      { id: shortid.generate(), name: "Eden Clements", number: "645-17-79" },
-      { id: shortid.generate(), name: "Annie Copeland", number: "227-91-26" },
+      { id: uuidv4(), name: 'Rosie Simpson', number: '459-12-56' },
+      { id: uuidv4(), name: 'Hermione Kline', number: '443-89-12' },
+      { id: uuidv4(), name: 'Eden Clements', number: '645-17-79' },
+      { id: uuidv4(), name: 'Annie Copeland', number: '227-91-26' },
     ],
-    filter: "",
+    filter: '',
   };
 
-  addContact = (task) => {
-    const searchSameName = this.state.contacts
-      .map((cont) => cont.name)
-      .includes(task.name);
+  addContact = ({ name, number }) => {
+    const contact = {
+      id: uuidv4(),
+      name,
+      number,
+    };
 
-    if (searchSameName) {
-      alert(`${task.name} is already in contacts`);
-    } else if (task.name.length === 0) {
-      alert("Fields must be filled!");
-    } else if (!/\d{3}[-]\d{2}[-]\d{2}/g.test(task.number)) {
-      alert("Enter the correct number phone!");
+    const { contacts } = this.state;
+
+    if (
+      contacts.find(
+        contact => contact.name.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      alert(`${name} is already in contacts.`);
+    } else if (contacts.find(contact => contact.number === number)) {
+      alert(`${number} is already in contacts.`);
+    } else if (name.trim() === '' || number.trim() === '') {
+      alert("Enter the contact's name and number phone!");
     } else {
-      const contact = {
-        ...task,
-        id: shortid.generate(),
-      };
-
-      this.setState((prevState) => ({
-        contacts: [...prevState.contacts, contact],
+      this.setState(({ contacts }) => ({
+        contacts: [contact, ...contacts],
       }));
     }
   };
 
-  changeFilter = (filter) => {
-    this.setState({ filter });
+  deleteContact = contactId => {
+    this.setState(({ contacts }) => ({
+      contacts: contacts.filter(contact => contact.id !== contactId),
+    }));
+  };
+
+  changeFilter = e => {
+    this.setState({ filter: e.currentTarget.value });
   };
 
   getVisibleContacts = () => {
     const { contacts, filter } = this.state;
+    const normalizedFilter = filter.toLowerCase();
 
-    return contacts.filter((contacts) =>
-      contacts.name.toLowerCase().includes(filter.toLowerCase())
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter),
     );
   };
 
-  removeContact = (contactId) => {
-    this.setState((prevState) => {
-      return {
-        contacts: prevState.contacts.filter(({ id }) => id !== contactId),
-      };
-    });
-  };
-
   render() {
-    const { filter } = this.state;
-
+    const { filter, contacts } = this.state;
     const visibleContacts = this.getVisibleContacts();
-
     return (
-      <div>
+      <Container>
         <h1>Phonebook</h1>
-
-        <ContactForm onAddContact={this.addContact} />
+        <ContactForm onSubmit={this.addContact} />
         <h2>Contacts</h2>
-        {visibleContacts.length > 1 && (
-          <Filter value={filter} onChangeFilter={this.changeFilter} />
+        {contacts.length > 1 && (
+          <Filter value={filter} onChange={this.changeFilter} />
         )}
-        {visibleContacts.length > 0 && (
+        {contacts.length > 0 ? (
           <ContactList
             contacts={visibleContacts}
-            onRemoveContact={this.removeContact}
+            onDeleteContact={this.deleteContact}
           />
+        ) : (
+          <p>Your phonebook is empty. Please add contact.</p>
         )}
-      </div>
+      </Container>
     );
   }
 }

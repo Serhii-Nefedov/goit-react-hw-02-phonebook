@@ -1,29 +1,23 @@
-.filter {
-  width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+.label {
+  text-align: left;
+  display: block;
+  margin-top: 10px;
+  color: var(--secondaryTextColor);
+  font-weight: 500;
+  font-size: 18px;
 }
 
-.filter__input {
-  color: #252525;
-  font: inherit;
-  font-size: 1.2rem;
+.input {
+  display: block;
+  margin-top: 5px;
   padding: 10px;
+  width: 100%;
+  border: 1px solid rgba(33, 33, 33, 0.2);
   border-radius: 4px;
-  border: 2px solid #bdbdbd;
-  width: 250px;
-  outline: 0;
-}
-
-.filter__input:focus {
-  border: 1px solid #2b32b2;
-}
-
-.filter_label {
-  width: 370px;
-   display: inline-block;
-  margin-bottom: 16px;
-  font-size: 20px;
-  color: #252525;
   cursor: pointer;
+  font-size: 15px;
+}
+
+.input:focus {
+  outline-color: var(--accentColor);
 }
